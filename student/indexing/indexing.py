@@ -35,7 +35,7 @@ class Indexing:
     def build_chunks(self, chunk_size: int = 2000) -> None:
         splitter = RecursiveCharacterTextSplitter(
             chunk_size=chunk_size,
-            chunk_overlap=0,
+            chunk_overlap=200,
             keep_separator=True,
             add_start_index=True,
         )
