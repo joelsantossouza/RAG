@@ -9,10 +9,11 @@ def main() -> None:
     index.load_files("data/vllm-0.10.1/")
     index.build_chunks()
     index.build_indexes()
-    chunks = index.retrieve("Hello world", 1)
+    question = "What activation formats does the fused batched MoE layer return in vLLM?"
+    chunks = index.retrieve(question, 5)
 
     agent = AnswerGenerator()
-    print(agent.generate_answer("Hello world?", chunks))
+    print(agent.generate_answer(question, chunks))
 
 
 if __name__ == "__main__":

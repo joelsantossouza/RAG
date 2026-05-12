@@ -32,17 +32,6 @@ class Indexing:
                 continue
             self.files_path.append(file_path)
 
-    def _read_chunk_data(self, chunk_metadata: MinimalSource) -> str:
-        with open(chunk_metadata.file_path,
-                  "r",
-                  encoding="utf-8",
-                  errors="ignore") as f:
-            f.seek(chunk_metadata.first_character_index)
-            return f.read(
-                chunk_metadata.last_character_index -
-                chunk_metadata.first_character_index
-            )
-
     def build_chunks(self, chunk_size: int = 2000) -> None:
         splitter = RecursiveCharacterTextSplitter(
             chunk_size=chunk_size,
@@ -69,7 +58,7 @@ class Indexing:
                 self.chunks.append(
                     Chunk(
                         metadata=chunk_metadata,
-                        data=self._read_chunk_data(chunk_metadata)
+                        data=content[start:end]
                     )
                 )
 
