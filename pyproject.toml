@@ -7,4 +7,6 @@ dependencies = [
 	"langchain-text-splitters",
 	"langchain-core",
 	"bm25s",
+	"transformers",
+	"torch",
 ]
