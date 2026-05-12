@@ -1,2 +1,2 @@
 # flake8: noqa: F401
-from .schema import MinimalSource
+from .schema import MinimalSource, Chunk

@@ -1,4 +1,6 @@
 from student.indexing import Indexing
+from student.generation import AnswerGenerator
+
 
 def main() -> None:
     """
@@ -7,9 +9,11 @@ def main() -> None:
     index.load_files("data/vllm-0.10.1/")
     index.build_chunks()
     index.build_indexes()
-    for chunk in index.retrieve("What activation formats does the fused batched MoE layer return in vLLM?", 1):
-        print(chunk.file_path)
-        print(index._read_chunk(chunk))
+    chunks = index.retrieve("Hello world", 1)
+
+    agent = AnswerGenerator()
+    print(agent.generate_answer("Hello world?", chunks))
+
 
 if __name__ == "__main__":
     main()
