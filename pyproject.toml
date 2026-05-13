@@ -9,4 +9,5 @@ dependencies = [
 	"bm25s",
 	"transformers",
 	"torch",
+	"llama-cpp-python",
 ]

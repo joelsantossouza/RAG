@@ -1,10 +1,14 @@
 from pathlib import Path, PosixPath
-from ..models import MinimalSource, Chunk
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_core.documents import Document
 from bm25s import BM25
 from bm25s.tokenization import Tokenized as BM25Tokenized
 import bm25s
+from ..models import (
+    MinimalSource,
+    UnansweredQuestion,
+    MinimalSearchResults
+)
 
 
 class Indexing:
@@ -13,7 +17,7 @@ class Indexing:
 
     def __init__(self) -> None:
         self.files_path: list[PosixPath] = []
-        self.chunks: list[Chunk] = []
+        self.chunks: list[MinimalSource] = []
         self.corpus: list[str] = []
         self.bm25: BM25 = BM25()
 
@@ -50,14 +54,11 @@ class Indexing:
                 start: int = doc.metadata["start_index"]
                 end: int = start + len(doc.page_content)
 
-                chunk_metadata: MinimalSource = MinimalSource(
-                    file_path=file_path.as_posix(),
-                    first_character_index=start,
-                    last_character_index=end,
-                )
                 self.chunks.append(
-                    Chunk(
-                        metadata=chunk_metadata,
+                    MinimalSource(
+                        file_path=file_path.as_posix(),
+                        first_character_index=start,
+                        last_character_index=end,
                         data=content[start:end]
                     )
                 )
@@ -69,12 +70,20 @@ class Indexing:
         tokenized_corpus: BM25Tokenized = bm25s.tokenize(self.corpus)
         self.bm25.index(tokenized_corpus)
 
-    def retrieve(self, query: str, top_k: int = 5) -> list[Chunk]:
-        tokenized_query: BM25Tokenized = bm25s.tokenize(query)
-        chunks_id, _ = self.bm25.retrieve(
-            tokenized_query,
+    def retrieve_batch(self, questions: list[UnansweredQuestion],
+                       top_k: int = 5) -> list[MinimalSearchResults]:
+        tokenized_queries: BM25Tokenized = bm25s.tokenize(
+            [q.question for q in questions]
+        )
+        chunks_ids, _ = self.bm25.retrieve(
+            tokenized_queries,
             k=top_k,
         )
         return [
-            self.chunks[i] for i in chunks_id[0]
+            MinimalSearchResults(
+                question_id=question.question_id,
+                question=question.question,
+                retrieved_sources=[self.chunks[i] for i in chunks_ids[q]]
+            )
+            for q, question in enumerate(questions)
         ]
