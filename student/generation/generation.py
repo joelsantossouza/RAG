@@ -3,6 +3,7 @@ import json
 from llama_cpp import Llama
 from tqdm import tqdm
 from ..models import (
+    MinimalSource,
     MinimalAnswer,
     MinimalSearchResults,
     StudentSearchResults,
@@ -119,6 +120,17 @@ class DataSet:
         self._write(output.model_dump(
             exclude={"search_results": {"__all__": {"content"}}}
         ), output_path)
+
+    def save_sources(
+        self,
+        sources: list[MinimalSource],
+        output_path: str
+    ) -> None:
+        data = [
+            {"source": source.model_dump()}
+            for source in sources
+        ]
+        self._write(data, output_path)
 
     def _write(self, data: dict, output_path: str) -> None:
         os.makedirs(os.path.dirname(output_path), exist_ok=True)

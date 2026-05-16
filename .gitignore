@@ -2,3 +2,5 @@
 *__pycache__*
 *.pyc
 *.gguf
+data/output
+data/processed
